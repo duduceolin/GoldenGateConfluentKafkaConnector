@@ -16,8 +16,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <ogg.bd.path>/goldengate/ogg/oggbg</ogg.bd.path>
-        <ogg.bd.version>12.3.0.1.0.012</ogg.bd.version>
+        <ogg.bd.path>/home/eduardo/Documents/</ogg.bd.path>
+        <ogg.bd.version>12.2.0.1.2.001</ogg.bd.version>
     </properties>
     <dependencies>
         <dependency>
@@ -25,35 +25,35 @@
             <artifactId>ggaddons</artifactId>
             <version>${ogg.bd.version}</version>
             <scope>system</scope>
-            <systemPath>${ogg.bd.path}/ggjava/resources/lib/ggaddons-${ogg.bd.version}.jar</systemPath>
+            <systemPath>${ogg.bd.path}/libs/ggaddons-${ogg.bd.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.goldengate.atg</groupId>
             <artifactId>ggcmdui</artifactId>
             <version>${ogg.bd.version}</version>
             <scope>system</scope>
-            <systemPath>${ogg.bd.path}/ggjava/resources/lib/ggcmdui-${ogg.bd.version}.jar</systemPath>
+            <systemPath>${ogg.bd.path}/libs/ggcmdui-${ogg.bd.version}.jar</systemPath>
         </dependency>
                 <dependency>
             <groupId>com.goldengate.atg</groupId>
             <artifactId>ggdbutil</artifactId>
                     <version>${ogg.bd.version}</version>
             <scope>system</scope>
-            <systemPath>${ogg.bd.path}/ggjava/resources/lib/ggdbutil-${ogg.bd.version}.jar</systemPath>
+            <systemPath>${ogg.bd.path}/libs/ggdbutil-${ogg.bd.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.goldengate.atg</groupId>
             <artifactId>ggutil</artifactId>
             <version>${ogg.bd.version}</version>
             <scope>system</scope>
-            <systemPath>${ogg.bd.path}/ggjava/resources/lib/ggutil-${ogg.bd.version}.jar</systemPath>
+            <systemPath>${ogg.bd.path}/libs/ggutil-${ogg.bd.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.goldengate.atg</groupId>
             <artifactId>ggdbutil</artifactId>
             <version>${ogg.bd.version}</version>
             <scope>system</scope>
-            <systemPath>${ogg.bd.path}/ggjava/resources/lib/ggdbutil-${ogg.bd.version}.jar</systemPath>
+            <systemPath>${ogg.bd.path}/libs/ggdbutil-${ogg.bd.version}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
