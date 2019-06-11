@@ -5,10 +5,9 @@
  */
 package oracle.goldengate.kafkaconnect;
 
-import java.util.Properties;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import oracle.goldengate.datasource.GGDataSource.Status;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -31,6 +30,9 @@ public class GGProducer {
     private Converter valueConverter = null;
     //The Kafka Producer
     private KafkaProducer<byte[],byte[]> kafkaProducer = null;
+
+    //CEOLIN - Topic name
+    private GGConfig config;
     
     /**
      * Initialize the Kafka Producer
@@ -48,7 +50,7 @@ public class GGProducer {
         kafkaProducer = new KafkaProducer<>(kafkaProps);
 
         final Map<String, String> propsAsMap = new HashMap<>((Map) kafkaProps);
-        final GGConfig config = new GGConfig(propsAsMap);
+        this.config = new GGConfig(propsAsMap);
         //Instantiate the key and value converters
         keyConverter = config.getConfiguredInstance(GGConfig.KEY_CONVERTER_CLASS_CONFIG, Converter.class);
         keyConverter.configure(config.originalsWithPrefix("key.converter."), true);
@@ -59,10 +61,21 @@ public class GGProducer {
     public Status send(SourceRecord record){
         Status status = Status.OK;
 
-        final byte[] key = keyConverter.fromConnectData(record.topic(), record.keySchema(), record.key());
-        final byte[] value = valueConverter.fromConnectData(record.topic(), record.valueSchema(), record.value());
+        Properties topics = new Properties();
+
+        try {
+            topics.load(this.getClass().getResourceAsStream("/" + "topics.properties"));
+        } catch (Exception e) {
+            logger.debug("Error to load topics file.");
+            logger.error(e.getLocalizedMessage(), e);
+        }
+
+
+
+        final byte[] key = keyConverter.fromConnectData(deixarCledaoFeliz(record.topic(), topics), record.keySchema(), record.key());
+        final byte[] value = valueConverter.fromConnectData(deixarCledaoFeliz(record.topic(), topics), record.valueSchema(), record.value());
         //Instantiate the Kafka producer record
-	    final ProducerRecord<byte[],byte[]> pRecord = new ProducerRecord<>(record.topic(), record.kafkaPartition(), key, value);
+	    final ProducerRecord<byte[],byte[]> pRecord = new ProducerRecord<>(deixarCledaoFeliz(record.topic(), topics), record.kafkaPartition(), key, value);
         try{
             kafkaProducer.send(pRecord);
         }catch(final Exception e){
@@ -71,7 +84,32 @@ public class GGProducer {
         }
         return status;
     }
-    
+
+    private String deixarCledaoFeliz(final String tableName, final Properties properties) {
+
+        Enumeration<Object> names = properties.keys();
+
+        String nameMatch = "";
+
+        while (names.hasMoreElements()) {
+            String name = (String)names.nextElement();
+
+            String pattern = name.replaceAll("\\*", "\\.*");
+
+            if (Pattern.compile(pattern).matcher(tableName).find()) {
+
+                nameMatch = name;
+                break;
+            }
+        }
+
+        if (nameMatch == null || nameMatch.equals(""))
+            nameMatch = tableName;
+
+        return properties.getProperty(nameMatch);
+
+    }
+
     /**
      * Flush the Kafka Connection.  This should be called at transaction (or
      * grouped transaction) commit to ensure write durability.

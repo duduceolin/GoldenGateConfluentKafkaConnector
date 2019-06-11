@@ -62,9 +62,14 @@ public class KafkaConnectFormattedData implements NgFormattedData {
     }
 
     @Override
-    public long getPayloadSchemaFingerprint() {
-        throw new UnsupportedOperationException("Wrapper Schema is unsupported.");
+    public int getPayloadSchemaHashCode() {
+        return 0;
     }
+
+//    @Override
+//    public long getPayloadSchemaFingerprint() {
+//        throw new UnsupportedOperationException("Wrapper Schema is unsupported.");
+//    }
 
     @Override
     public String getSchemaSuffix() {
