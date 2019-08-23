@@ -10,8 +10,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import oracle.goldengate.datasource.GGDataSource.Status;
+import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.storage.Converter;
 import org.slf4j.Logger;
@@ -31,7 +33,6 @@ public class GGProducer {
     //The Kafka Producer
     private KafkaProducer<byte[],byte[]> kafkaProducer = null;
 
-    //CEOLIN - Topic name
     private GGConfig config;
     
     /**
@@ -70,22 +71,24 @@ public class GGProducer {
             logger.error(e.getLocalizedMessage(), e);
         }
 
+        final String topicName = findTopicNameBasedOnRegex(record.topic(), topics);
 
+        final byte[] key = keyConverter.fromConnectData(topicName, record.keySchema(), record.key());
+        final byte[] value = valueConverter.fromConnectData(topicName, record.valueSchema(), record.value());
 
-        final byte[] key = keyConverter.fromConnectData(deixarCledaoFeliz(record.topic(), topics), record.keySchema(), record.key());
-        final byte[] value = valueConverter.fromConnectData(deixarCledaoFeliz(record.topic(), topics), record.valueSchema(), record.value());
         //Instantiate the Kafka producer record
-	    final ProducerRecord<byte[],byte[]> pRecord = new ProducerRecord<>(deixarCledaoFeliz(record.topic(), topics), record.kafkaPartition(), key, value);
+	    final ProducerRecord<byte[],byte[]> pRecord = new ProducerRecord<>(topicName, record.kafkaPartition(), key, value);
         try{
-            kafkaProducer.send(pRecord);
+            kafkaProducer.send(pRecord).get();
         }catch(final Exception e){
             logger.error("An exception occurred sending a message to Kafka.", e);
             status = Status.ABEND;
         }
+
         return status;
     }
 
-    private String deixarCledaoFeliz(final String tableName, final Properties properties) {
+    private String findTopicNameBasedOnRegex(final String tableName, final Properties properties) {
 
         Enumeration<Object> names = properties.keys();
 
